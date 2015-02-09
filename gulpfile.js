@@ -19,7 +19,7 @@ var paths = {
     jsxDir: "src/jsx",
     cssDir: "dist/css",
     sassMain: "src/sass/app.scss",
-    sasDir: "src/sass"
+    sassDir: "src/sass"
 }
 
 gulp.task("browserify", function() {
@@ -74,7 +74,7 @@ gulp.task("flow", function() {
 })
 
 gulp.task("sass", function() {
-    del.sync("dist/css")
+    del.sync(paths.cssDir)
 
     return sass(paths.sassMain)
         .pipe(gulp.dest(paths.cssDir))
