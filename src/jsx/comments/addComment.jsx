@@ -1,13 +1,20 @@
+/* @flow */
+var React = require("react")
+
+type State = {
+    comment: string
+}
+
 var AddComment = React.createClass({
     propTypes: {
         addNewComment: React.PropTypes.func.isRequired
     },
-    getInitialState() {
+    getInitialState(): State {
         return {
             comment: ""
         }
     },
-    updateComment(event) {
+    updateComment(event: any) {
         this.setState({
             comment: event.target.value
         })
@@ -18,7 +25,7 @@ var AddComment = React.createClass({
             comment: ""
         })
     },
-    render() {
+    render(): any {
         return (
             <div>
                 <h2>Add new comment</h2>
@@ -30,3 +37,5 @@ var AddComment = React.createClass({
         )
     }
 })
+
+module.exports = AddComment

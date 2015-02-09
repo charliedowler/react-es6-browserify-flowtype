@@ -1,8 +1,11 @@
+/* @flow */
+var React = require("react")
+
 var ListComments = React.createClass({
     propTypes: {
         comments: React.PropTypes.array.isRequired
     },
-    render() {
+    render(): any {
         var allComments = this.props.comments.map((comment) =>
             <div>{comment}</div>
         )
@@ -14,3 +17,5 @@ var ListComments = React.createClass({
         )
     }
 })
+
+module.exports = ListComments

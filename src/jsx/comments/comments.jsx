@@ -1,16 +1,26 @@
+/* @flow */
+var React = require("react")
+var {RouteHandler} = require("react-router")
+var AddComment = require("./addComment.jsx")
+var ListComments = require("./listComments.jsx")
+
+type State = {
+    comments: Array<any>
+}
+
 var Comments = React.createClass({
-    getInitialState() {
+    getInitialState(): State {
         return {
             comments: []
         }
     },
-    addNew(comment) {
+    addNew(comment: any) {
         var comments = [].concat(this.state.comments, comment)
         this.setState({
             comments: comments
         })
     },
-    render() {
+    render(): any {
         return (
             <div>
                 <h1>Comments</h1>
@@ -22,3 +32,5 @@ var Comments = React.createClass({
         )
     }
 })
+
+module.exports = Comments
