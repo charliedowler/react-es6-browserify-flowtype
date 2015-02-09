@@ -2,4 +2,5 @@
 bower
 node_modules
 .DS_Store
-dist
+public/app.min-*.js
+public/app.min-*.css

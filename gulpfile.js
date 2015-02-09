@@ -11,6 +11,15 @@ var watchify = require("watchify")
 var reactify = require("reactify")
 var streamify = require("gulp-streamify")
 var notifier = require("node-notifier")
+var uglify = require("gulp-uglify")
+var rename = require("gulp-rename")
+
+var reactifyES6 = function(file) {
+    return reactify(file, {
+        "harmony": true,
+        "strip-types": true
+    })
+}
 
 var paths = {
     jsDir: "dist/js",
@@ -24,13 +33,6 @@ var paths = {
 
 gulp.task("browserify", function() {
     del.sync(paths.jsDir)
-
-    var reactifyES6 = function(file) {
-        return reactify(file, {
-            "harmony": true,
-            "strip-types": true
-        })
-    }
 
     var watcher  = watchify(browserify({
         entries: [paths.jsxMain],
@@ -57,16 +59,21 @@ gulp.task("browserify", function() {
     .pipe(gulp.dest(paths.jsDir))
 })
 
-gulp.task("build", function() {
-  browserify({
-    entries: [paths.jsxMain],
-    transform: [reactify]
-  })
+gulp.task("uglify", function() {
+    del.sync("public/app.min-*.js")
+
+    var hash = Math.random().toString(36).substring(2, 10)
+
+    return browserify({
+        entries: [paths.jsxMain],
+        transform: [reactifyES6]
+    })
     .bundle()
     .pipe(source(paths.jsBundle))
-    .pipe(streamify(uglify("app.min.js")))
-    .pipe(gulp.dest("public"));
-});
+    .pipe(streamify(uglify()))
+    .pipe(rename("app.min-" + hash + ".js"))
+    .pipe(gulp.dest("public"))
+})
 
 gulp.task("flow", function() {
     return gulp.src(paths.jsxDir + "/**/*.jsx")
