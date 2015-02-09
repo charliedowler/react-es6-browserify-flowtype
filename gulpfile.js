@@ -12,8 +12,18 @@ var reactify = require("reactify")
 var streamify = require("gulp-streamify")
 var notifier = require("node-notifier")
 
+var paths = {
+    jsDir: "dist/js",
+    jsBundle: "app.js",
+    jsxMain: "./src/jsx/app.jsx",
+    jsxDir: "src/jsx",
+    cssDir: "dist/css",
+    sassMain: "src/sass/app.scss",
+    sasDir: "src/sass"
+}
+
 gulp.task("browserify", function() {
-    del.sync("dist/js")
+    del.sync(paths.jsDir)
 
     var reactifyES6 = function(file) {
         return reactify(file, {
@@ -23,7 +33,7 @@ gulp.task("browserify", function() {
     }
 
     var watcher  = watchify(browserify({
-        entries: ["./src/jsx/app.jsx"],
+        entries: [paths.jsxMain],
         transform: [reactifyES6],
         debug: true,
         cache: {},
@@ -32,31 +42,42 @@ gulp.task("browserify", function() {
     }))
 
     return watcher.on("update", function() {
-        del.sync("dist/js")
+        del.sync(paths.jsDir)
 
         gutil.log(gutil.colors.green("Browserify: updating app.js..."))
 
         watcher.bundle()
-            .pipe(source("app.js"))
-            .pipe(gulp.dest("dist/js"))
+            .pipe(source(paths.jsBundle))
+            .pipe(gulp.dest(paths.jsDir))
 
         gutil.log(gutil.colors.green("Browserify: app.js updated"))
     })
     .bundle()
-    .pipe(source("app.js"))
-    .pipe(gulp.dest("dist/js"))
+    .pipe(source(paths.jsBundle))
+    .pipe(gulp.dest(paths.jsDir))
 })
 
+gulp.task("build", function() {
+  browserify({
+    entries: [paths.jsxMain],
+    transform: [reactify]
+  })
+    .bundle()
+    .pipe(source(paths.jsBundle))
+    .pipe(streamify(uglify("app.min.js")))
+    .pipe(gulp.dest("public"));
+});
+
 gulp.task("flow", function() {
-    return gulp.src("src/jsx/**/*.jsx")
+    return gulp.src(paths.jsxDir + "/**/*.jsx")
         .pipe(flow())
 })
 
 gulp.task("sass", function() {
     del.sync("dist/css")
 
-    return sass(["src/sass/app.scss"])
-        .pipe(gulp.dest("dist/css"))
+    return sass(paths.sassMain)
+        .pipe(gulp.dest(paths.cssDir))
 })
 
 gulp.task("server", function() {
@@ -67,10 +88,10 @@ gulp.task("server", function() {
 
 gulp.task("watch", function() {
     livereload.listen()
-    gulp.watch("src/sass/**/*.scss", ["sass"])
-    gulp.watch("dist/css/**/*.css").on("change", livereload.changed)
-    gulp.watch("dist/js/app.js").on("change", livereload.changed)
-    gulp.watch("src/jsx/**/*.jsx", ["flow"])
+    gulp.watch(paths.sassDir + "/**/*.scss", ["sass"])
+    gulp.watch(paths.cssDir + "/**/*.css").on("change", livereload.changed)
+    gulp.watch(paths.jsDir + "/" + paths.jsBundle).on("change", livereload.changed)
+    gulp.watch(paths.jsxDir + "/**/*.jsx", ["flow"])
 })
 
 gulp.task("default", ["server", "sass", "browserify", "watch"])

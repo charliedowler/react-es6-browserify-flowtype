@@ -1,4 +1,5 @@
 /* @flow */
+var React = require("react")
 var Navigation = require("./navigation.jsx")
 var {RouteHandler} = require("react-router")
 
